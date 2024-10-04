@@ -15,4 +15,11 @@ class Game:
 
     def view_inventory(self):
     return self.inventory
+    
+    def craft_item(self, item_1, item_2):
+    if item_1 in self.inventory and item_2 in self.inventory:
+        crafted_item = f"{item_1} + {item_2}"
+        print(f"Crafted: {crafted_item}")
+        return crafted_item
+
 
