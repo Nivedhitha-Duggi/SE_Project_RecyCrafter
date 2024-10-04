@@ -1,12 +1,22 @@
-class ItemCollection:
+class Game:
     def __init__(self):
-        self.collected_items = []
+        self.items_collected = 0
+        self.inventory = []
 
     def collect_item(self, item):
-        """Collect item and add to the inventory"""
-        self.collected_items.append(item)
+        """Collect an item and add it to the inventory."""
+        self.inventory.append(item)
+        self.items_collected += 1
         print(f"Collected: {item}")
 
-    def show_inventory(self):
-        """Display collected items"""
-        return self.collected_items
+    def recycle_item(self, item):
+        """Recycle an item if it's in the inventory."""
+        if item in self.inventory:
+            self.inventory.remove(item)
+            print(f"Recycled: {item}")
+        else:
+            print("Item not found in inventory.")
+
+    def update(self):
+        """Placeholder for game logic updates (e.g., player movement)."""
+        pass
