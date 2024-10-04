@@ -1,2 +1,3 @@
+# Placeholder for tutorial code
 def show_tutorial():
-    print("Tutorial: Collect items, recycle them, and craft new objects."
+    print("Welcome to the tutorial!")
