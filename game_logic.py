@@ -10,4 +10,6 @@ class Game:
     def recycle_item(self, item):
     if item in self.inventory:
         self.inventory.remove(item)
+    def view_inventory(self):
+    return self.inventory
 
