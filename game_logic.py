@@ -7,3 +7,7 @@ class Game:
         """Collect an item and add it to the inventory."""
         self.inventory.append(item)
         self.items_collected += 1
+    def recycle_item(self, item):
+    if item in self.inventory:
+        self.inventory.remove(item)
+
