@@ -11,8 +11,6 @@ SCREEN_HEIGHT = 600
 
 # Colors
 WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-GRAY = (200, 200, 200)
 
 # Initialize screen
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -24,7 +22,11 @@ player_img = pygame.image.load("assets/player.png")
 bottle_img = pygame.image.load("assets/bottle.png")
 thorn_img = pygame.image.load("assets/thorn.png")
 
-pygame.mixer.music.load("assets/bakground.mp3")
+# Initialize mixer for background music
+pygame.mixer.init()
+pygame.mixer.music.load("assets/bakground.mp3")  # Ensure correct path and file name
+pygame.mixer.music.play(-1)  # Loop music infinitely
+
 
 # Scale images
 player_img = pygame.transform.scale(player_img, (80, 80))
@@ -42,8 +44,6 @@ lives = 3
 bottle_target = [20, 15, 10]
 fall_speed = [5, 7, 10]  # Speed increases with each level
 items = []
-player_name = ""
-game_summary = ""
 
 def reset_level():
     """Reset the items for a new level."""
@@ -77,60 +77,24 @@ def check_collision():
                 lives -= 1
             items.remove(item)
 
-def draw_text(text, x, y, size=36, color=WHITE):
+def draw_game():
+    """Draw the game screen."""
+    screen.blit(pygame.image.load(backgrounds[level]), (0, 0))
+    screen.blit(player_img, player)
+    for item in items:
+        img = bottle_img if item["type"] == "bottle" else thorn_img
+        screen.blit(img, item["rect"])
+    draw_text(f"Level: {level + 1}", 10, 10)
+    draw_text(f"Score: {score}/{bottle_target[level]}", 10, 50)
+    draw_text(f"Lives: {lives}", 10, 90)
+
+def draw_text(text, x, y):
     """Draw text on the screen."""
-    font = pygame.font.Font(None, size)
-    text_surface = font.render(text, True, color)
+    font = pygame.font.Font(None, 36)
+    text_surface = font.render(text, True, WHITE)
     screen.blit(text_surface, (x, y))
 
-def get_player_name():
-    """Display a screen to take the player's name."""
-    global player_name
-    input_active = True
-    user_text = ""
-
-    while input_active:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:
-                    player_name = user_text
-                    input_active = False
-                elif event.key == pygame.K_BACKSPACE:
-                    user_text = user_text[:-1]
-                else:
-                    user_text += event.unicode
-
-        screen.fill(BLACK)
-        draw_text("Enter Your Name:", 250, 200, 50, WHITE)
-        pygame.draw.rect(screen, GRAY, pygame.Rect(250, 300, 300, 50))
-        draw_text(user_text, 260, 310, 40, BLACK)
-        pygame.display.flip()
-
-def show_summary():
-    """Display the game summary."""
-    global game_summary
-    screen.fill(BLACK)
-    draw_text("Game Over", 300, 150, 60, WHITE)
-    draw_text(f"Player: {player_name}", 300, 250, 50, WHITE)
-    draw_text(f"Levels Completed: {level}", 300, 320, 50, WHITE)
-    draw_text(f"Final Score: {score}", 300, 390, 50, WHITE)
-    draw_text("Press Q to Quit", 300, 460, 40, WHITE)
-    pygame.display.flip()
-
-    waiting = True
-    while waiting:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_q):
-                pygame.quit()
-                sys.exit()
-
-# Main Game Loop
-get_player_name()
-pygame.mixer.music.play(-1)
-
+# Game loop
 running = True
 while running:
     for event in pygame.event.get():
@@ -154,32 +118,26 @@ while running:
 
     # Check for game over or level progression
     if lives <= 0:
+        print("Game Over! You ran out of lives.")
         running = False
     elif score >= bottle_target[level]:
         level += 1
         if level == len(backgrounds):
+            print("Congratulations! You completed all levels!")
             running = False
         else:
+            print(f"Level {level} completed! Get ready for Level {level + 1}!")
             reset_level()
             score = 0
     elif len(items) > 50:  # Too many uncollected items (optional rule)
+        print("Game Over! Too many items missed.")
         running = False
 
-    # Draw game screen
-    screen.blit(pygame.image.load(backgrounds[level]), (0, 0))
-    screen.blit(player_img, player)
-    for item in items:
-        img = bottle_img if item["type"] == "bottle" else thorn_img
-        screen.blit(img, item["rect"])
-    draw_text(f"Level: {level + 1}", 10, 10)
-    draw_text(f"Score: {score}/{bottle_target[level]}", 10, 50)
-    draw_text(f"Lives: {lives}", 10, 90)
+    # Draw everything
+    draw_game()
 
     pygame.display.flip()
     clock.tick(30)
 
-pygame.mixer.music.stop()
-show_summary()
 pygame.quit()
 sys.exit()
-
